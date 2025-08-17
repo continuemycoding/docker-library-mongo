@@ -16,10 +16,10 @@ RUN set -eux; \
 RUN set -eux; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		ca-certificates \
-		jq \
-		numactl \
-		procps \
+	ca-certificates \
+	jq \
+	numactl \
+	procps \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -34,12 +34,12 @@ RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends \
-		gnupg \
-		wget \
+	gnupg \
+	wget \
 	; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
-# download/install gosu
+	# download/install gosu
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
 	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
@@ -49,7 +49,7 @@ RUN set -eux; \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
 	\
-# download/install js-yaml
+	# download/install js-yaml
 	mkdir -p /opt/js-yaml/; \
 	wget -O /opt/js-yaml/js-yaml.tgz https://registry.npmjs.org/js-yaml/-/js-yaml-${JSYAML_VERSION}.tgz; \
 	echo "$JSYAML_CHECKSUM */opt/js-yaml/js-yaml.tgz" | sha256sum -c -; \
@@ -57,7 +57,7 @@ RUN set -eux; \
 	rm /opt/js-yaml/js-yaml.tgz; \
 	ln -s /opt/js-yaml/dist/js-yaml.js /js-yaml.js; \
 	\
-# download/install MongoDB PGP keys
+	# download/install MongoDB PGP keys
 	export GNUPGHOME="$(mktemp -d)"; \
 	wget -O KEYS 'https://pgp.mongodb.com/server-dev.asc' 'https://pgp.mongodb.com/server-6.0.asc'; \
 	gpg --batch --import KEYS; \
@@ -70,7 +70,7 @@ RUN set -eux; \
 	apt-mark manual $savedAptMark > /dev/null; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	\
-# smoke test
+	# smoke test
 	chmod +x /usr/local/bin/gosu; \
 	gosu --version; \
 	gosu nobody true
@@ -95,22 +95,22 @@ ENV MONGO_VERSION 6.0.26~rc0
 # 08/08/2025, https://github.com/mongodb/mongo/tree/0c4ec4b6005f75582ce208fc800f09f561b6c2e8
 
 RUN set -x \
-# installing "mongodb-enterprise" pulls in "tzdata" which prompts for input
+	# installing "mongodb-enterprise" pulls in "tzdata" which prompts for input
 	&& export DEBIAN_FRONTEND=noninteractive \
 	&& apt-get update \
 	&& apt-get install -y \
-		${MONGO_PACKAGE}=$MONGO_VERSION \
-		${MONGO_PACKAGE}-server=$MONGO_VERSION \
-		${MONGO_PACKAGE}-shell=$MONGO_VERSION \
-		${MONGO_PACKAGE}-mongos=$MONGO_VERSION \
-		${MONGO_PACKAGE}-tools=$MONGO_VERSION \
-		${MONGO_PACKAGE}-database=$MONGO_VERSION \
-		${MONGO_PACKAGE}-database-tools-extra=$MONGO_VERSION \
+	${MONGO_PACKAGE}=$MONGO_VERSION \
+	${MONGO_PACKAGE}-server=$MONGO_VERSION \
+	${MONGO_PACKAGE}-shell=$MONGO_VERSION \
+	${MONGO_PACKAGE}-mongos=$MONGO_VERSION \
+	${MONGO_PACKAGE}-tools=$MONGO_VERSION \
+	${MONGO_PACKAGE}-database=$MONGO_VERSION \
+	${MONGO_PACKAGE}-database-tools-extra=$MONGO_VERSION \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/lib/mongodb \
 	&& mv /etc/mongod.conf /etc/mongod.conf.orig
 
-VOLUME /data/db /data/configdb
+VOLUME /data/configdb
 
 # ensure that if running as custom user that "mongosh" has a valid "HOME"
 # https://github.com/docker-library/mongo/issues/524
